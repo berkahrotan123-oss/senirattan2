@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SENI RATTAN - Pembukuan Mingguan</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <section id="authScreen" class="auth-screen">
+    <form id="loginForm" class="auth-card">
+      <div class="brand auth-brand"><div class="brand-mark">SR</div><div><strong>SENI RATTAN</strong><span>Pembukuan Online</span></div></div>
+      <h1>Masuk ke Aplikasi</h1>
+      <p class="muted">Gunakan akun yang dibuat di Supabase Authentication.</p>
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn btn-primary" type="submit">Masuk</button>
+      <div id="authMessage"></div>
+    </form>
+  </section>
+  <div id="appShell" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">SR</div>
+        <div>
+          <strong>SENI RATTAN</strong>
+          <span>Pembukuan Mingguan</span>
+        </div>
+      </div>
+      <nav id="navMenu" class="nav-menu">
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="daily-cash">Kas Harian</button>
+        <button class="nav-item" data-view="suppliers">Supplier</button>
+        <button class="nav-item" data-view="purchases">Pembelian Supplier</button>
+        <button class="nav-item" data-view="weekly-expenses">Pengeluaran Mingguan</button>
+        <button class="nav-item" data-view="saturday-payments">Pembayaran Sabtu</button>
+        <button class="nav-item" data-view="reports">Laporan Siklus</button>
+      </nav>
+      <div class="sidebar-footer">
+        <small>Data tersimpan online di Supabase.</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <button id="menuToggle" class="menu-toggle" aria-label="Buka menu">☰</button>
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="cycleLabel" class="muted"></p>
+        </div>
+        <div class="topbar-actions">
+          <div id="userIdentity" class="user-identity"></div>
+          <label class="compact-field">
+            <span>Siklus</span>
+            <input id="cycleDatePicker" type="date" />
+          </label>
+          <button id="seedDemoBtn" class="btn btn-secondary">Isi Data Contoh</button>
+          <button id="refreshBtn" class="btn btn-secondary">Sinkronkan</button>
+          <button id="logoutBtn" class="btn btn-danger-outline">Keluar</button>
+        </div>
+      </header>
+
+      <section id="alertArea"></section>
+
+      <section id="dashboard" class="view active">
+        <div class="metric-grid" id="dashboardMetrics"></div>
+        <div class="grid two-col">
+          <article class="card">
+            <div class="card-header"><h2>Ringkasan Pengeluaran</h2></div>
+            <div id="expenseBreakdown"></div>
+          </article>
+          <article class="card">
+            <div class="card-header"><h2>Status Kas Harian</h2></div>
+            <div id="dailyStatus"></div>
+          </article>
+        </div>
+        <article class="card">
+          <div class="card-header"><h2>Tagihan Belum Lunas</h2></div>
+          <div id="unpaidSummary"></div>
+        </article>
+      </section>
+
+      <section id="daily-cash" class="view">
+        <div class="grid two-col">
+          <article class="card">
+            <div class="card-header"><h2>Kas Masuk dari Owner</h2></div>
+            <form id="ownerCashForm" class="form-grid">
+              <label>Tanggal<input name="date" type="date" required /></label>
+              <label>Nominal<input name="amount" type="number" min="0" step="1000" required /></label>
+              <label>Diterima oleh<input name="receiver" type="text" required placeholder="Nama penerima" /></label>
+              <label>Keterangan<input name="note" type="text" placeholder="Dana operasional pagi" /></label>
+              <button class="btn btn-primary full" type="submit">Simpan Kas Masuk</button>
+            </form>
+          </article>
+
+          <article class="card">
+            <div class="card-header"><h2>Pengeluaran Harian</h2></div>
+            <form id="dailyExpenseForm" class="form-grid">
+              <label>Tanggal<input name="date" type="date" required /></label>
+              <label>Kategori
+                <select name="category" required>
+                  <option value="">Pilih kategori</option>
+                  <option>Bensin</option><option>Belanja Bahan</option><option>Pembelian Produk</option>
+                  <option>Ongkir</option><option>Konsumsi</option><option>Peralatan Kecil</option><option>Lain-lain</option>
+                </select>
+              </label>
+              <label>Nominal<input name="amount" type="number" min="0" step="1000" required /></label>
+              <label>Keterangan<input name="note" type="text" required /></label>
+              <button class="btn btn-primary full" type="submit">Simpan Pengeluaran</button>
+            </form>
+          </article>
+        </div>
+
+        <article class="card">
+          <div class="card-header"><h2>Penutupan Kas Harian</h2></div>
+          <form id="dailyClosingForm" class="form-grid closing-grid">
+            <label>Tanggal<input name="date" type="date" required /></label>
+            <label>Kas fisik saat ditutup<input name="physicalCash" type="number" min="0" step="1000" required /></label>
+            <label>Dikembalikan kepada<input name="returnedTo" type="text" required placeholder="Owner / nama penerima" /></label>
+            <label>Catatan<input name="note" type="text" placeholder="Opsional" /></label>
+            <button class="btn btn-primary full" type="submit">Tutup & Kembalikan Sisa Kas</button>
+          </form>
+          <div id="dailyCashTable"></div>
+        </article>
+      </section>
+
+      <section id="suppliers" class="view">
+        <div class="grid two-col">
+          <article class="card">
+            <div class="card-header"><h2>Tambah Supplier</h2></div>
+            <form id="supplierForm" class="form-grid">
+              <label>Nama supplier<input name="name" required /></label>
+              <label>Jenis kerajinan/barang<input name="productType" required /></label>
+              <label>Nomor HP<input name="phone" required /></label>
+              <label>Nama bank<input name="bankName" placeholder="Opsional" /></label>
+              <label>Nomor rekening<input name="accountNumber" placeholder="Opsional" /></label>
+              <label>Nama pemilik rekening<input name="accountHolder" placeholder="Opsional" /></label>
+              <label>Status
+                <select name="status"><option>Aktif</option><option>Nonaktif</option></select>
+              </label>
+              <label>Catatan<input name="note" placeholder="Opsional" /></label>
+              <button class="btn btn-primary full" type="submit">Simpan Supplier</button>
+            </form>
+          </article>
+          <article class="card">
+            <div class="card-header"><h2>Database Supplier</h2></div>
+            <div id="supplierTable"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="purchases" class="view">
+        <article class="card">
+          <div class="card-header"><h2>Input Pembelian Supplier</h2></div>
+          <form id="purchaseForm" class="form-grid three-col-form">
+            <label>Tanggal pembelian<input name="date" type="date" required /></label>
+            <label>Supplier<select name="supplierId" id="purchaseSupplier" required></select></label>
+            <label>Barang<input name="item" required /></label>
+            <label>Jumlah<input name="qty" type="number" min="0.01" step="0.01" required /></label>
+            <label>Satuan<input name="unit" placeholder="pcs/kg/set" required /></label>
+            <label>Harga satuan<input name="unitPrice" type="number" min="0" step="1000" required /></label>
+            <label>Cara pembayaran
+              <select name="paymentType" required>
+                <option value="cash">Lunas / Cash Hari Ini</option>
+                <option value="tempo">Tempo / Bayar Sabtu</option>
+              </select>
+            </label>
+            <label>Metode pembayaran
+              <select name="paymentMethod"><option value="cash">Cash</option><option value="transfer">Transfer</option></select>
+            </label>
+            <label>Keterangan<input name="note" placeholder="Opsional" /></label>
+            <button class="btn btn-primary full" type="submit">Simpan Pembelian</button>
+          </form>
+        </article>
+        <article class="card">
+          <div class="card-header"><h2>Daftar Pembelian Siklus</h2></div>
+          <div id="purchaseTable"></div>
+        </article>
+      </section>
+
+      <section id="weekly-expenses" class="view">
+        <div class="grid two-col">
+          <article class="card">
+            <div class="card-header"><h2>Tambah Pengeluaran Mingguan</h2></div>
+            <form id="weeklyExpenseForm" class="form-grid">
+              <label>Tanggal pencatatan<input name="date" type="date" required /></label>
+              <label>Kategori
+                <select name="category" required><option>Gaji Karyawan</option><option>Operasional Mingguan</option><option>Tagihan Lain</option></select>
+              </label>
+              <label>Nominal<input name="amount" type="number" min="0" step="1000" required /></label>
+              <label>Keterangan<input name="note" required /></label>
+              <label>Status awal
+                <select name="status"><option value="unpaid">Belum Dibayar</option><option value="paid">Langsung Lunas</option></select>
+              </label>
+              <label>Metode pembayaran
+                <select name="paymentMethod"><option value="cash">Cash</option><option value="transfer">Transfer</option></select>
+              </label>
+              <button class="btn btn-primary full" type="submit">Simpan Pengeluaran Mingguan</button>
+            </form>
+          </article>
+          <article class="card">
+            <div class="card-header"><h2>Daftar Pengeluaran Mingguan</h2></div>
+            <div id="weeklyExpenseTable"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="saturday-payments" class="view">
+        <article class="card">
+          <div class="card-header">
+            <div><h2>Pembayaran Akhir Minggu</h2><p class="muted">Pilih tagihan tempo atau pengeluaran mingguan yang dibayar.</p></div>
+          </div>
+          <div id="saturdayPaymentList"></div>
+        </article>
+      </section>
+
+      <section id="reports" class="view">
+        <article class="card">
+          <div class="card-header report-actions">
+            <div><h2>Laporan Siklus Mingguan</h2><p class="muted">Periode Senin sampai Sabtu.</p></div>
+            <button id="printReportBtn" class="btn btn-secondary">Cetak Laporan</button>
+          </div>
+          <div id="reportContent"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <template id="emptyTemplate"><div class="empty-state">Belum ada data.</div></template>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
