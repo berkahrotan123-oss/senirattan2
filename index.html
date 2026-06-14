@@ -155,20 +155,15 @@
           <form id="purchaseForm" class="form-grid three-col-form">
             <label>Tanggal pembelian<input name="date" type="date" required /></label>
             <label>Supplier<select name="supplierId" id="purchaseSupplier" required></select></label>
-            <label>Barang<input name="item" required /></label>
-            <label>Jumlah<input name="qty" type="number" min="0.01" step="0.01" required /></label>
-            <label>Satuan<input name="unit" placeholder="pcs/kg/set" required /></label>
-            <label>Harga satuan<input name="unitPrice" type="number" min="0" step="1000" required /></label>
+            <label>Jumlah / Total Pembelian<input name="amount" type="number" min="0" step="1000" required placeholder="Contoh: 1500000" /></label>
             <label>Cara pembayaran
               <select name="paymentType" required>
                 <option value="cash">Lunas / Cash Hari Ini</option>
                 <option value="tempo">Tempo / Bayar Sabtu</option>
               </select>
             </label>
-            <label>Metode pembayaran
-              <select name="paymentMethod"><option value="cash">Cash</option><option value="transfer">Transfer</option></select>
-            </label>
             <label>Keterangan<input name="note" placeholder="Opsional" /></label>
+            <label class="full">Upload nota<input name="receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required /><small>Format JPG, PNG, WebP, atau PDF. Maksimal 5 MB.</small></label>
             <button class="btn btn-primary full" type="submit">Simpan Pembelian</button>
           </form>
         </article>

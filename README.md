@@ -44,3 +44,8 @@ Langkah:
 4. Jalankan file tersebut di SQL Editor.
 
 Nama dan role pengguna akan tampil di bagian kanan atas aplikasi setelah login.
+
+## Perubahan v4
+- Field Metode Pembayaran pada form Pembelian Supplier dihapus.
+- Pembelian cash tetap dicatat sebagai pembayaran langsung.
+- Pembelian tempo menentukan metode pembayaran saat dilunasi di menu Pembayaran Akhir Minggu.
