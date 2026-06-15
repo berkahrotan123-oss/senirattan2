@@ -8,3 +8,4 @@
 .user-identity{display:grid;gap:1px;padding:7px 11px;border:1px solid var(--border);border-radius:9px;background:white;min-width:110px}.user-identity strong{font-size:13px}.user-identity span{font-size:11px;color:var(--muted)}
 .form-grid small{font-size:11px;color:var(--muted);font-weight:400}
 input[type=file]{padding:8px;background:#fafcfb}
+.action-buttons{display:flex;gap:6px;flex-wrap:wrap}.action-buttons .btn{white-space:nowrap}
