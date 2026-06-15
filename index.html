@@ -29,11 +29,11 @@
       </div>
       <nav id="navMenu" class="nav-menu">
         <button class="nav-item active" data-view="dashboard">Dashboard</button>
-        <button class="nav-item" data-view="daily-cash">Kas Harian</button>
-        <button class="nav-item" data-view="suppliers">Supplier</button>
-        <button class="nav-item" data-view="purchases">Pembelian Supplier</button>
-        <button class="nav-item" data-view="weekly-expenses">Pengeluaran Mingguan</button>
-        <button class="nav-item" data-view="saturday-payments">Pembayaran Sabtu</button>
+        <button class="nav-item" data-view="daily-cash">Uang Harian</button>
+        <button class="nav-item" data-view="purchases">Barang Masuk</button>
+        <button class="nav-item" data-view="weekly-expenses">Beban Mingguan</button>
+        <button class="nav-item" data-view="saturday-payments">Bayaran Sabtu</button>
+        <button class="nav-item" data-view="suppliers">Data Supplier</button>
         <button class="nav-item" data-view="reports">Laporan Siklus</button>
       </nav>
       <div class="sidebar-footer">
@@ -155,7 +155,12 @@
           <div class="card-header"><h2>Input Pembelian Supplier</h2></div>
           <form id="purchaseForm" class="form-grid three-col-form">
             <label>Tanggal pembelian<input name="date" type="date" required /></label>
-            <label>Supplier<select name="supplierId" id="purchaseSupplier" required></select></label>
+            <label>Supplier
+              <input id="purchaseSupplierSearch" list="purchaseSupplierOptions" placeholder="Ketik nama supplier..." autocomplete="off" required />
+              <datalist id="purchaseSupplierOptions"></datalist>
+              <input type="hidden" name="supplierId" id="purchaseSupplierId" />
+              <small>Ketik nama supplier, lalu pilih dari saran yang muncul.</small>
+            </label>
             <label>Jumlah / Total Pembelian<input name="amount" type="number" min="0" step="1000" required placeholder="Contoh: 1500000" /></label>
             <label>Cara pembayaran
               <select name="paymentType" required>
