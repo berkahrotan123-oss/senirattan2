@@ -242,6 +242,18 @@
     </main>
   </div>
 
+
+  <div id="receiptModal" class="receipt-modal hidden" role="dialog" aria-modal="true" aria-labelledby="receiptModalTitle">
+    <div class="receipt-modal-backdrop" data-close-receipt></div>
+    <div class="receipt-modal-dialog">
+      <div class="receipt-modal-header">
+        <h2 id="receiptModalTitle">Preview Nota</h2>
+        <button id="closeReceiptModal" class="receipt-modal-close" type="button" aria-label="Tutup preview">&times;</button>
+      </div>
+      <div id="receiptPreview" class="receipt-preview"></div>
+    </div>
+  </div>
+
   <template id="emptyTemplate"><div class="empty-state">Belum ada data.</div></template>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
