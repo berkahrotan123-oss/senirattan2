@@ -86,7 +86,7 @@
             <div class="card-header"><h2>Kas Masuk dari Owner</h2></div>
             <form id="ownerCashForm" class="form-grid">
               <label>Tanggal<input name="date" type="date" required /></label>
-              <label>Nominal<input name="amount" type="number" min="0" step="1000" required /></label>
+              <label>Nominal<input name="amount" type="number" min="0" step="any" inputmode="numeric" required /></label>
               <label>Diterima oleh<input name="receiver" type="text" required placeholder="Nama penerima" /></label>
               <label>Keterangan<input name="note" type="text" placeholder="Dana operasional pagi" /></label>
               <button class="btn btn-primary full" type="submit">Simpan Kas Masuk</button>
@@ -105,7 +105,7 @@
                   <option>Listrik</option><option>Lain Lain</option>
                 </select>
               </label>
-              <label>Nominal<input name="amount" type="number" min="0" step="1000" required /></label>
+              <label>Nominal<input name="amount" type="number" min="0" step="any" inputmode="numeric" required /></label>
               <label>Keterangan<input name="note" type="text" required /></label>
               <button class="btn btn-primary full" type="submit">Simpan Pengeluaran</button>
             </form>
@@ -116,7 +116,7 @@
           <div class="card-header"><h2>Penutupan Kas Harian</h2></div>
           <form id="dailyClosingForm" class="form-grid closing-grid">
             <label>Tanggal<input name="date" type="date" required /></label>
-            <label>Kas fisik saat ditutup<input name="physicalCash" type="number" min="0" step="1000" required /></label>
+            <label>Kas fisik saat ditutup<input name="physicalCash" type="number" min="0" step="any" inputmode="numeric" required /></label>
             <label>Dikembalikan kepada<input name="returnedTo" type="text" required placeholder="Owner / nama penerima" /></label>
             <label>Catatan<input name="note" type="text" placeholder="Opsional" /></label>
             <button class="btn btn-primary full" type="submit">Tutup & Kembalikan Sisa Kas</button>
@@ -172,7 +172,7 @@
               <input type="hidden" name="supplierId" id="purchaseSupplierId" />
               <small>Ketik nama supplier, lalu pilih dari saran yang muncul.</small>
             </label>
-            <label>Jumlah / Total Pembelian<input name="amount" type="number" min="0" step="1000" required placeholder="Contoh: 1500000" /></label>
+            <label>Jumlah / Total Pembelian<input name="amount" type="number" min="0" step="any" inputmode="numeric" required placeholder="Contoh: 1500000" /></label>
             <label>Cara pembayaran
               <select name="paymentType" required>
                 <option value="cash">Lunas / Cash Hari Ini</option>
@@ -199,7 +199,7 @@
               <label>Kategori
                 <select name="category" required><option>Gaji Karyawan</option><option>Operasional Mingguan</option><option>Tagihan Lain</option></select>
               </label>
-              <label>Nominal<input name="amount" type="number" min="0" step="1000" required /></label>
+              <label>Nominal<input name="amount" type="number" min="0" step="any" inputmode="numeric" required /></label>
               <label>Keterangan<input name="note" required /></label>
               <label>Status awal
                 <select name="status"><option value="unpaid">Belum Dibayar</option><option value="paid">Langsung Lunas</option></select>
