@@ -29,7 +29,14 @@
       </div>
       <nav id="navMenu" class="nav-menu">
         <button class="nav-item active" data-view="dashboard">Dashboard</button>
-        <button class="nav-item" data-view="daily-cash">Uang Harian</button>
+        <div class="nav-group">
+          <button class="nav-item nav-parent" data-view="daily-income" data-title="Uang Harian">Uang Harian</button>
+          <div class="sub-nav">
+            <button class="nav-item sub-nav-item" data-view="daily-income" data-title="Uang Masuk">Uang Masuk</button>
+            <button class="nav-item sub-nav-item" data-view="daily-expense" data-title="Pengeluaran Harian">Pengeluaran Harian</button>
+            <button class="nav-item sub-nav-item" data-view="daily-closing" data-title="Penutupan Kas">Penutupan Kas</button>
+          </div>
+        </div>
         <button class="nav-item" data-view="purchases">Barang Masuk</button>
         <button class="nav-item" data-view="weekly-expenses">Beban Mingguan</button>
         <button class="nav-item" data-view="saturday-payments">Bayaran Sabtu</button>
@@ -80,38 +87,50 @@
         </article>
       </section>
 
-      <section id="daily-cash" class="view">
-        <div class="grid two-col">
-          <article class="card">
-            <div class="card-header"><h2>Kas Masuk dari Owner</h2></div>
-            <form id="ownerCashForm" class="form-grid">
-              <label>Tanggal<input name="date" type="date" required /></label>
-              <label>Nominal<input name="amount" type="number" min="0" step="any" inputmode="numeric" required /></label>
-              <label>Diterima oleh<input name="receiver" type="text" required placeholder="Nama penerima" /></label>
-              <label>Keterangan<input name="note" type="text" placeholder="Dana operasional pagi" /></label>
-              <button class="btn btn-primary full" type="submit">Simpan Kas Masuk</button>
-            </form>
-          </article>
+      <section id="daily-income" class="view">
+        <article class="card">
+          <div class="card-header"><h2>Uang Masuk dari Owner</h2></div>
+          <form id="ownerCashForm" class="form-grid">
+            <label>Tanggal<input name="date" type="date" required /></label>
+            <label>Nominal<input name="amount" type="number" min="0" step="any" inputmode="numeric" required /></label>
+            <label>Diterima oleh<input name="receiver" type="text" required placeholder="Nama penerima" /></label>
+            <label>Keterangan<input name="note" type="text" placeholder="Dana operasional pagi" /></label>
+            <button class="btn btn-primary full" type="submit">Simpan Uang Masuk</button>
+          </form>
+        </article>
 
-          <article class="card">
-            <div class="card-header"><h2>Pengeluaran Harian</h2></div>
-            <form id="dailyExpenseForm" class="form-grid">
-              <label>Tanggal<input name="date" type="date" required /></label>
-              <label>Kategori
-                <select name="category" required>
-                  <option value="">Pilih kategori</option>
-                  <option>Bensin</option><option>Belanja Bahan</option><option>Belanja Paku</option>
-                  <option>Ongkir</option><option>Konsumsi Karyawan</option><option>Beli Peralatan</option>
-                  <option>Listrik</option><option>Lain Lain</option>
-                </select>
-              </label>
-              <label>Nominal<input name="amount" type="number" min="0" step="any" inputmode="numeric" required /></label>
-              <label>Keterangan<input name="note" type="text" required /></label>
-              <button class="btn btn-primary full" type="submit">Simpan Pengeluaran</button>
-            </form>
-          </article>
-        </div>
+        <article class="card">
+          <div class="card-header"><h2>Riwayat Uang Masuk</h2></div>
+          <div id="ownerCashTable"></div>
+        </article>
+      </section>
 
+      <section id="daily-expense" class="view">
+        <article class="card">
+          <div class="card-header"><h2>Pengeluaran Harian</h2></div>
+          <form id="dailyExpenseForm" class="form-grid">
+            <label>Tanggal<input name="date" type="date" required /></label>
+            <label>Kategori
+              <select name="category" required>
+                <option value="">Pilih kategori</option>
+                <option>Bensin</option><option>Belanja Bahan</option><option>Belanja Paku</option>
+                <option>Ongkir</option><option>Konsumsi Karyawan</option><option>Beli Peralatan</option>
+                <option>Listrik</option><option>Lain Lain</option>
+              </select>
+            </label>
+            <label>Nominal<input name="amount" type="number" min="0" step="any" inputmode="numeric" required /></label>
+            <label>Keterangan<input name="note" type="text" required /></label>
+            <button class="btn btn-primary full" type="submit">Simpan Pengeluaran</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <div class="card-header"><h2>Riwayat Pengeluaran Harian</h2></div>
+          <div id="dailyExpenseTable"></div>
+        </article>
+      </section>
+
+      <section id="daily-closing" class="view">
         <article class="card">
           <div class="card-header"><h2>Penutupan Kas Harian</h2></div>
           <form id="dailyClosingForm" class="form-grid closing-grid">
@@ -121,19 +140,12 @@
             <label>Catatan<input name="note" type="text" placeholder="Opsional" /></label>
             <button class="btn btn-primary full" type="submit">Tutup & Kembalikan Sisa Kas</button>
           </form>
-          <div id="dailyCashTable"></div>
         </article>
 
-        <div class="grid two-col">
-          <article class="card">
-            <div class="card-header"><h2>Riwayat Kas Masuk</h2></div>
-            <div id="ownerCashTable"></div>
-          </article>
-          <article class="card">
-            <div class="card-header"><h2>Riwayat Pengeluaran Harian</h2></div>
-            <div id="dailyExpenseTable"></div>
-          </article>
-        </div>
+        <article class="card">
+          <div class="card-header"><h2>Status Penutupan Kas</h2></div>
+          <div id="dailyCashTable"></div>
+        </article>
       </section>
 
       <section id="suppliers" class="view">
