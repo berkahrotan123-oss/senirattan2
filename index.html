@@ -29,6 +29,7 @@
       </div>
       <nav id="navMenu" class="nav-menu">
         <button class="nav-item active" data-view="dashboard" data-roles="owner,secretary">Dashboard</button>
+        <button class="nav-item" data-view="owner-profit" data-roles="owner">Rekap Profit</button>
         <div class="nav-group" data-roles="owner,secretary">
           <button class="nav-item nav-parent" data-view="daily-income" data-title="Uang Harian">Uang Harian</button>
           <div class="sub-nav">
@@ -101,6 +102,21 @@
         <article class="card">
           <div class="card-header"><h2>Tagihan Belum Lunas</h2></div>
           <div id="unpaidSummary"></div>
+        </article>
+      </section>
+
+
+
+      <section id="owner-profit" data-roles="owner" class="view">
+        <article class="card">
+          <div class="card-header report-actions">
+            <div>
+              <h2>Rekap Profit Owner</h2>
+              <p class="muted">Perbandingan uang keluar total dengan uang masuk Sales per siklus.</p>
+            </div>
+          </div>
+          <div id="ownerProfitMetrics" class="metric-grid"></div>
+          <div id="ownerProfitTable"></div>
         </article>
       </section>
 

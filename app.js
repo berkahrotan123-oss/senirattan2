@@ -88,9 +88,48 @@ async function updateRow(tableName,id,payload){const {error}=await sb.from(table
 async function recalcClosing(date){const closing=db.dailyClosings.find(x=>x.date===date);if(!closing)return;const expected=dailyCashBalance(date);await updateRow('daily_closings',closing.id,{expected_cash:expected,difference:Number(closing.physicalCash)-expected});}
 async function handle(action){try{await action()}catch(err){console.error(err);showAlert(err.message||'Terjadi kesalahan.','error')}}
 
-function renderAll(){renderCycleLabel();renderCashBalanceHeader();renderDashboard();renderDailyCash();renderDailyCashFlow();renderDailyTransactionTables();renderSuppliers();renderPurchaseOptions();renderPurchaseDpOptions();renderSupplierDownPayments();renderPurchases();renderWeeklyExpenses();renderSaturdayPayments();renderPaymentHistory();renderSupplierReport();renderSalesDashboard();renderSalesChannels();renderSalesIncomes();renderSalesReport();renderReport();applyRoleUi();setDefaultDates()}
+function renderAll(){renderCycleLabel();renderCashBalanceHeader();renderDashboard();renderOwnerProfit();renderDailyCash();renderDailyCashFlow();renderDailyTransactionTables();renderSuppliers();renderPurchaseOptions();renderPurchaseDpOptions();renderSupplierDownPayments();renderPurchases();renderWeeklyExpenses();renderSaturdayPayments();renderPaymentHistory();renderSupplierReport();renderSalesDashboard();renderSalesChannels();renderSalesIncomes();renderSalesReport();renderReport();applyRoleUi();setDefaultDates()}
 function renderCycleLabel(){const c=getCycle(selectedDate);document.getElementById('cycleLabel').textContent=`Siklus ${formatDate(c.start)} - ${formatDate(c.end)}`}
 function renderCashBalanceHeader(){const box=document.getElementById('cashBalanceHeader');if(!box)return;const d=selectedDate||getTodayLocal();const balance=dailyCashBalance(d);const label=d===getTodayLocal()?'Sisa Kas Hari Ini':'Sisa Kas Tanggal Dipilih';box.innerHTML=`<span>${label}</span><strong class="${balance<0?'negative':''}">${fmt(balance)}</strong><small>${formatDate(d)}</small>`}
+
+function cycleName(c){
+  const months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const a=parseDate(c.start), b=parseDate(c.end);
+  return `${String(a.getDate()).padStart(2,'0')}${months[a.getMonth()]}-${String(b.getDate()).padStart(2,'0')}${months[b.getMonth()]} ${b.getFullYear()}`;
+}
+function getAllCycleRanges(){
+  const dates=[];
+  ['dailyExpenses','purchases','weeklyExpenses','payments','supplierDownPayments','salesIncomes'].forEach(k=>{
+    (db[k]||[]).forEach(x=>{ if(x.date) dates.push(x.date); });
+  });
+  if(!dates.length) dates.push(selectedDate);
+  const starts=[...new Set(dates.map(d=>getCycle(d).start))].sort().reverse();
+  return starts.map(start=>getCycle(start));
+}
+function totalCashOutForCycle(c){
+  const daily=sum(db.dailyExpenses.filter(x=>inCycle(x.date,c)));
+  const dp=sum(db.supplierDownPayments.filter(x=>inCycle(x.date,c)),'amount');
+  const cashPurch=sum(db.purchases.filter(p=>inCycle(p.date,c)&&p.paymentType==='cash').map(p=>({amount:Math.max(0,purchaseTotal(p)-dpAppliedForPurchase(p.id))})));
+  const payments=sum(db.payments.filter(p=>inCycle(p.date,c)),'amount');
+  const weeklyPaidDirect=sum(db.weeklyExpenses.filter(x=>inCycle(x.date,c)&&x.status==='paid'),'amount');
+  return daily+dp+cashPurch+payments+weeklyPaidDirect;
+}
+function renderOwnerProfit(){
+  const box=document.getElementById('ownerProfitTable');
+  if(!box) return;
+  const cycles=getAllCycleRanges();
+  const data=cycles.map(c=>{
+    const out=totalCashOutForCycle(c);
+    const sales=sum(db.salesIncomes.filter(x=>inCycle(x.date,c)),'amount');
+    return {c,out,sales,profit:sales-out};
+  });
+  const totalOut=sum(data,'out'), totalSales=sum(data,'sales'), totalProfit=totalSales-totalOut;
+  const metrics=document.getElementById('ownerProfitMetrics');
+  if(metrics) metrics.innerHTML=`<div class="metric"><span>Total Uang Keluar</span><strong>${fmt(totalOut)}</strong></div><div class="metric"><span>Total Uang Masuk Sales</span><strong>${fmt(totalSales)}</strong></div><div class="metric ${totalProfit<0?'warning':''}"><span>Total Profit</span><strong>${fmt(totalProfit)}</strong></div>`;
+  const rows=data.map(x=>`<tr><td>${cycleName(x.c)}</td><td class="amount">${fmt(x.out)}</td><td class="amount">${fmt(x.sales)}</td><td class="amount ${x.profit<0?'negative':'positive'}">${fmt(x.profit)}</td></tr>`);
+  box.innerHTML=table(['Nama Siklus','Uang Keluar Total','Uang Masuk Sales','Profit'],rows);
+}
+
 function renderDashboard(){const {c,ownerCash,dailyExpenses,purchases,weeklyExpenses,supplierDownPayments}=cycleData();const cashPurch=purchases.filter(p=>p.paymentType==='cash');const tempo=purchases.filter(p=>p.paymentType==='tempo');const cashPurchaseTotal=sum(cashPurch.map(p=>({amount:Math.max(0,purchaseTotal(p)-dpAppliedForPurchase(p.id))})));const dpTotal=sum(supplierDownPayments);const weeklyPaidNow=weeklyExpenses.filter(x=>x.status==='paid');const directOut=sum(dailyExpenses)+dpTotal+cashPurchaseTotal+sum(weeklyPaidNow);const supplierTempoTotal=sum(tempo.map(p=>({amount:purchaseTotal(p)})));const supplierTempoPaid=sum(tempo.map(p=>({amount:purchasePaidFor(p.id)})));const weeklyUnpaidTotal=sum(weeklyExpenses.filter(x=>x.status==='unpaid'));const weeklyPaid=sum(weeklyExpenses.map(x=>({amount:paidFor('weekly',x.id)})));const outstanding=Math.max(0,supplierTempoTotal-supplierTempoPaid)+Math.max(0,weeklyUnpaidTotal-weeklyPaid);const ownerTotal=sum(ownerCash);const returnTotal=sum(db.dailyClosings.filter(x=>inCycle(x.date,c)),'physicalCash');const metrics=[['Dana dari Owner',fmt(ownerTotal),''],['Pengeluaran Langsung',fmt(directOut),''],['Tagihan Belum Lunas',fmt(outstanding),outstanding?'warning':''],['Dikembalikan ke Owner',fmt(returnTotal),'']];document.getElementById('dashboardMetrics').innerHTML=metrics.map(m=>`<div class="metric ${m[2]}"><span>${m[0]}</span><strong>${m[1]}</strong></div>`).join('');const breakdown={'Pengeluaran Harian':sum(dailyExpenses),'DP Supplier':dpTotal,'Pembelian Supplier Cash':cashPurchaseTotal,'Pembelian Supplier Tempo':supplierTempoTotal,'Pengeluaran Mingguan':sum(weeklyExpenses)};document.getElementById('expenseBreakdown').innerHTML=`<div class="summary-list">${Object.entries(breakdown).map(([k,v])=>`<div class="summary-row"><span>${k}</span><strong>${fmt(v)}</strong></div>`).join('')}</div>`;const days=[];for(let i=0;i<6;i++){const d=parseDate(c.start);d.setDate(d.getDate()+i);const ds=iso(d);const incoming=sum(ownerCash.filter(x=>x.date===ds));const spent=sum(dailyExpenses.filter(x=>x.date===ds))+downPaymentOutOnDate(ds)+cashPurchaseOutOnDate(ds)+cashPaymentsOnDate(ds);const closing=db.dailyClosings.find(x=>x.date===ds);days.push(`<tr><td>${formatDate(ds)}</td><td class="amount">${fmt(incoming)}</td><td class="amount">${fmt(spent)}</td><td>${closing?badge(closing.difference===0?'paid':'partial'):'<span class="badge badge-unpaid">Belum ditutup</span>'}</td></tr>`)}document.getElementById('dailyStatus').innerHTML=table(['Tanggal','Kas Masuk','Terpakai','Status'],days);const unpaidRows=[];tempo.forEach(p=>{const total=purchaseTotal(p),paid=purchasePaidFor(p.id),remain=total-paid;if(remain>0)unpaidRows.push(`<tr><td>${supplierName(p.supplierId)}</td><td>${p.note||'-'}</td><td class="amount">${fmt(total)}</td><td class="amount">${fmt(remain)}</td></tr>`)});weeklyExpenses.forEach(x=>{const paid=x.status==='paid'?x.amount:paidFor('weekly',x.id),remain=x.amount-paid;if(remain>0)unpaidRows.push(`<tr><td>${x.category}</td><td>${x.note}</td><td class="amount">${fmt(x.amount)}</td><td class="amount">${fmt(remain)}</td></tr>`)});document.getElementById('unpaidSummary').innerHTML=table(['Penerima/Kategori','Keterangan','Total','Sisa'],unpaidRows)}
 function renderDailyCash(){const {c,ownerCash,dailyExpenses}=cycleData();const rows=[];for(let i=0;i<6;i++){const d=parseDate(c.start);d.setDate(d.getDate()+i);const ds=iso(d);const incoming=sum(ownerCash.filter(x=>x.date===ds));const exp=sum(dailyExpenses.filter(x=>x.date===ds))+downPaymentOutOnDate(ds)+cashPurchaseOutOnDate(ds)+cashPaymentsOnDate(ds);const expected=incoming-exp;const closing=db.dailyClosings.find(x=>x.date===ds);const diff=closing?Number(closing.physicalCash)-expected:null;const action=closing?`<div class="action-buttons"><button class="btn btn-small btn-secondary" onclick="editDailyClosing('${closing.id}')">Edit</button>${isOwner()?`<button class="btn btn-small btn-danger-outline" onclick="deleteRecord('daily_closings','${closing.id}')">Buka Kembali</button>`:''}</div>`:'-';rows.push(`<tr><td>${formatDate(ds)}</td><td class="amount">${fmt(incoming)}</td><td class="amount">${fmt(exp)}</td><td class="amount">${fmt(expected)}</td><td class="amount">${closing?fmt(closing.physicalCash):'-'}</td><td class="amount ${diff<0?'negative':diff>0?'positive':''}">${diff===null?'-':fmt(diff)}</td><td>${closing?'<span class="badge badge-paid">Ditutup</span>':'<span class="badge badge-unpaid">Terbuka</span>'}</td><td>${action}</td></tr>`)}document.getElementById('dailyCashTable').innerHTML=table(['Tanggal','Kas Owner','Pengeluaran + Bayaran','Sisa Sistem','Kas Fisik','Selisih','Status','Aksi'],rows)}
 function renderDailyCashFlow(){
