@@ -33,6 +33,7 @@
           <button class="nav-item nav-parent" data-view="daily-income" data-title="Uang Harian">Uang Harian</button>
           <div class="sub-nav">
             <button class="nav-item sub-nav-item" data-view="daily-income" data-title="Uang Masuk">Uang Masuk</button>
+            <button class="nav-item sub-nav-item" data-view="daily-cashflow" data-title="Arus Kas Harian">Arus Kas Harian</button>
             <button class="nav-item sub-nav-item" data-view="daily-expense" data-title="Pengeluaran Harian">Pengeluaran Harian</button>
             <button class="nav-item sub-nav-item" data-view="daily-closing" data-title="Penutupan Kas">Penutupan Kas</button>
           </div>
@@ -103,6 +104,24 @@
         <article class="card">
           <div class="card-header"><h2>Riwayat Uang Masuk</h2></div>
           <div id="ownerCashTable"></div>
+        </article>
+      </section>
+
+
+      <section id="daily-cashflow" class="view">
+        <article class="card">
+          <div class="card-header report-actions">
+            <div>
+              <h2>Arus Kas Harian</h2>
+              <p class="muted">Tabel debit, credit, dan saldo untuk satu tanggal.</p>
+            </div>
+          </div>
+          <form id="dailyCashFlowFilter" class="form-grid three-col-form">
+            <label>Pilih tanggal<input name="date" type="date" required /></label>
+            <button class="btn btn-primary" type="submit">Tampilkan</button>
+          </form>
+          <div id="dailyCashFlowMetrics" class="metric-grid"></div>
+          <div id="dailyCashFlowTable"></div>
         </article>
       </section>
 
