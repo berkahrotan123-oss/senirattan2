@@ -59,3 +59,16 @@ Nama dan role pengguna akan tampil di bagian kanan atas aplikasi setelah login.
 - Edit riwayat pembayaran Sabtu.
 - Transaksi yang sudah dibayar tidak dapat diturunkan di bawah total pembayaran yang tercatat.
 - Aan dan Febri dapat mengedit; penghapusan tetap khusus owner.
+
+
+## v19
+- Urutan submenu Uang Harian diubah: Arus Kas Harian berada paling bawah setelah Penutupan Kas.
+
+## v20 - DP Supplier / Down Payment Barang Masuk
+- Menambahkan input DP supplier di halaman Barang Masuk.
+- DP langsung mengurangi sisa kas pada tanggal DP.
+- DP yang belum dipakai akan muncul saat input Barang Masuk untuk supplier yang sama.
+- Saat DP dipakai, sisa pembayaran barang masuk otomatis dikurangi nominal DP.
+- Arus Kas Harian, Penutupan Kas, Dashboard, Bayaran Sabtu, dan Laporan Siklus ikut memperhitungkan DP.
+
+Jika update dari versi lama, jalankan file `migration-v20-supplier-down-payments.sql` di Supabase SQL Editor sebelum deploy versi ini.
