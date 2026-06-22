@@ -56,6 +56,7 @@
           <p id="cycleLabel" class="muted"></p>
         </div>
         <div class="topbar-actions">
+          <div id="cashBalanceHeader" class="cash-balance-header"></div>
           <div id="userIdentity" class="user-identity"></div>
           <label class="compact-field">
             <span>Siklus</span>
@@ -239,6 +240,26 @@
         <article class="card">
           <div class="card-header"><h2>Riwayat Bayaran</h2></div>
           <div id="paymentHistoryTable"></div>
+        </article>
+      </section>
+
+
+      <section id="supplier-report" class="view">
+        <article class="card">
+          <div class="card-header report-actions">
+            <div>
+              <h2 id="supplierReportTitle">Laporan Transaksi Supplier</h2>
+              <p id="supplierReportSubtitle" class="muted">Pilih supplier dari menu Data Supplier.</p>
+            </div>
+            <button class="btn btn-secondary" type="button" onclick="backToSuppliers()">Kembali ke Data Supplier</button>
+          </div>
+          <form id="supplierReportFilter" class="form-grid three-col-form">
+            <label>Dari tanggal<input name="from" type="date" required /></label>
+            <label>Sampai tanggal<input name="to" type="date" required /></label>
+            <button class="btn btn-primary" type="submit">Tampilkan</button>
+          </form>
+          <div id="supplierReportMetrics" class="metric-grid"></div>
+          <div id="supplierReportTable"></div>
         </article>
       </section>
 
