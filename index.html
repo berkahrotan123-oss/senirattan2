@@ -38,7 +38,13 @@
             <button class="nav-item sub-nav-item" data-view="daily-cashflow" data-title="Arus Kas Harian">Arus Kas Harian</button>
           </div>
         </div>
-        <button class="nav-item" data-view="purchases">Barang Masuk</button>
+        <div class="nav-group">
+          <button class="nav-item nav-parent" data-view="supplier-dp" data-title="Barang Masuk">Barang Masuk</button>
+          <div class="sub-nav">
+            <button class="nav-item sub-nav-item" data-view="supplier-dp" data-title="DP Order">DP Order</button>
+            <button class="nav-item sub-nav-item" data-view="purchases" data-title="Pembelian Supplier">Pembelian Supplier</button>
+          </div>
+        </div>
         <button class="nav-item" data-view="weekly-expenses">Beban Mingguan</button>
         <button class="nav-item" data-view="saturday-payments">Bayaran Sabtu</button>
         <button class="nav-item" data-view="suppliers">Data Supplier</button>
@@ -193,10 +199,10 @@
         </div>
       </section>
 
-      <section id="purchases" class="view">
+      <section id="supplier-dp" class="view">
         <article class="card">
           <div class="card-header">
-            <div><h2>Input DP Barang Masuk</h2><p class="muted">DP supplier langsung mengurangi sisa kas pada tanggal DP.</p></div>
+            <div><h2>Input DP Order</h2><p class="muted">DP supplier langsung mengurangi sisa kas pada tanggal DP.</p></div>
           </div>
           <form id="supplierDownPaymentForm" class="form-grid three-col-form">
             <label>Tanggal DP<input name="date" type="date" required /></label>
@@ -212,9 +218,12 @@
           </form>
         </article>
         <article class="card">
-          <div class="card-header"><h2>Daftar DP Supplier Siklus</h2></div>
+          <div class="card-header"><h2>Daftar DP Order Siklus</h2></div>
           <div id="supplierDownPaymentTable"></div>
         </article>
+      </section>
+
+      <section id="purchases" class="view">
         <article class="card">
           <div class="card-header"><h2>Input Pembelian Supplier</h2></div>
           <form id="purchaseForm" class="form-grid three-col-form">

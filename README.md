@@ -72,3 +72,11 @@ Nama dan role pengguna akan tampil di bagian kanan atas aplikasi setelah login.
 - Arus Kas Harian, Penutupan Kas, Dashboard, Bayaran Sabtu, dan Laporan Siklus ikut memperhitungkan DP.
 
 Jika update dari versi lama, jalankan file `migration-v20-supplier-down-payments.sql` di Supabase SQL Editor sebelum deploy versi ini.
+
+## Perubahan v21
+
+- Menu Barang Masuk sekarang memiliki submenu:
+  - DP Order
+  - Pembelian Supplier
+- Form DP Order dipisahkan dari form Pembelian Supplier agar input lebih rapi.
+- Tidak ada perubahan struktur database dari v20.
