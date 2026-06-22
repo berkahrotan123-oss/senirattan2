@@ -48,6 +48,19 @@ create table if not exists public.purchases (
   created_at timestamptz not null default now()
 );
 
+
+create table if not exists public.supplier_down_payments (
+  id uuid primary key default gen_random_uuid(),
+  transaction_date date not null,
+  supplier_id uuid not null references public.suppliers(id),
+  amount numeric(14,2) not null check (amount > 0),
+  note text,
+  applied_purchase_id uuid references public.purchases(id) on delete set null,
+  applied_amount numeric(14,2) not null default 0 check (applied_amount >= 0),
+  created_by uuid not null default auth.uid() references auth.users(id),
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.weekly_expenses (
   id uuid primary key default gen_random_uuid(),
   transaction_date date not null,
@@ -87,6 +100,9 @@ create index if not exists owner_cash_date_idx on public.owner_cash(transaction_
 create index if not exists daily_expenses_date_idx on public.daily_expenses(transaction_date);
 create index if not exists purchases_date_idx on public.purchases(transaction_date);
 create index if not exists purchases_supplier_idx on public.purchases(supplier_id);
+create index if not exists supplier_down_payments_date_idx on public.supplier_down_payments(transaction_date);
+create index if not exists supplier_down_payments_supplier_idx on public.supplier_down_payments(supplier_id);
+create index if not exists supplier_down_payments_applied_idx on public.supplier_down_payments(applied_purchase_id);
 create index if not exists weekly_expenses_date_idx on public.weekly_expenses(transaction_date);
 create index if not exists payments_ref_idx on public.payments(ref_type, ref_id);
 create index if not exists payments_date_idx on public.payments(payment_date);
@@ -96,6 +112,7 @@ alter table public.suppliers enable row level security;
 alter table public.owner_cash enable row level security;
 alter table public.daily_expenses enable row level security;
 alter table public.purchases enable row level security;
+alter table public.supplier_down_payments enable row level security;
 alter table public.weekly_expenses enable row level security;
 alter table public.payments enable row level security;
 alter table public.daily_closings enable row level security;
@@ -104,7 +121,7 @@ alter table public.daily_closings enable row level security;
 do $$
 declare t text;
 begin
-  foreach t in array array['suppliers','owner_cash','daily_expenses','purchases','weekly_expenses','payments','daily_closings'] loop
+  foreach t in array array['suppliers','owner_cash','daily_expenses','purchases','supplier_down_payments','weekly_expenses','payments','daily_closings'] loop
     execute format('drop policy if exists "Authenticated users full access" on public.%I', t);
     execute format('create policy "Authenticated users full access" on public.%I for all to authenticated using (true) with check (true)', t);
   end loop;
@@ -151,7 +168,7 @@ for all to authenticated using (public.is_owner()) with check (public.is_owner()
 do $$
 declare t text;
 begin
-  foreach t in array array['suppliers','owner_cash','daily_expenses','purchases','weekly_expenses','payments','daily_closings'] loop
+  foreach t in array array['suppliers','owner_cash','daily_expenses','purchases','supplier_down_payments','weekly_expenses','payments','daily_closings'] loop
     execute format('drop policy if exists "Authenticated users full access" on public.%I', t);
     execute format('drop policy if exists "Staff read" on public.%I', t);
     execute format('drop policy if exists "Staff insert" on public.%I', t);
@@ -185,3 +202,47 @@ drop policy if exists "Authenticated users upload purchase receipts" on storage.
 create policy "Authenticated users upload purchase receipts" on storage.objects for insert to authenticated with check (bucket_id='purchase-receipts' and (storage.foldername(name))[1]=auth.uid()::text);
 drop policy if exists "Owner deletes purchase receipts" on storage.objects;
 create policy "Owner deletes purchase receipts" on storage.objects for delete to authenticated using (bucket_id='purchase-receipts' and public.is_owner());
+
+-- v22 Sales module
+alter table public.profiles drop constraint if exists profiles_role_check;
+alter table public.profiles add constraint profiles_role_check check (role in ('secretary','owner','sales'));
+
+create table if not exists public.sales_channels (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  note text,
+  status text not null default 'Aktif' check (status in ('Aktif','Nonaktif')),
+  created_by uuid not null default auth.uid() references auth.users(id),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.sales_incomes (
+  id uuid primary key default gen_random_uuid(),
+  transaction_date date not null,
+  channel_id uuid not null references public.sales_channels(id),
+  amount numeric(14,2) not null check (amount > 0),
+  note text,
+  created_by uuid not null default auth.uid() references auth.users(id),
+  created_at timestamptz not null default now()
+);
+create index if not exists sales_channels_name_idx on public.sales_channels(name);
+create index if not exists sales_incomes_date_idx on public.sales_incomes(transaction_date);
+create index if not exists sales_incomes_channel_idx on public.sales_incomes(channel_id);
+alter table public.sales_channels enable row level security;
+alter table public.sales_incomes enable row level security;
+grant select, insert, update, delete on public.sales_channels to authenticated;
+grant select, insert, update, delete on public.sales_incomes to authenticated;
+do $$
+declare t text;
+begin
+  foreach t in array array['sales_channels','sales_incomes'] loop
+    execute format('drop policy if exists "Staff read" on public.%I', t);
+    execute format('drop policy if exists "Staff insert" on public.%I', t);
+    execute format('drop policy if exists "Staff update" on public.%I', t);
+    execute format('drop policy if exists "Owner delete" on public.%I', t);
+    execute format('create policy "Staff read" on public.%I for select to authenticated using (true)', t);
+    execute format('create policy "Staff insert" on public.%I for insert to authenticated with check (true)', t);
+    execute format('create policy "Staff update" on public.%I for update to authenticated using (true) with check (true)', t);
+    execute format('create policy "Owner delete" on public.%I for delete to authenticated using (public.is_owner())', t);
+  end loop;
+end $$;

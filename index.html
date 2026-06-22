@@ -28,8 +28,8 @@
         </div>
       </div>
       <nav id="navMenu" class="nav-menu">
-        <button class="nav-item active" data-view="dashboard">Dashboard</button>
-        <div class="nav-group">
+        <button class="nav-item active" data-view="dashboard" data-roles="owner,secretary">Dashboard</button>
+        <div class="nav-group" data-roles="owner,secretary">
           <button class="nav-item nav-parent" data-view="daily-income" data-title="Uang Harian">Uang Harian</button>
           <div class="sub-nav">
             <button class="nav-item sub-nav-item" data-view="daily-income" data-title="Uang Masuk">Uang Masuk</button>
@@ -38,17 +38,26 @@
             <button class="nav-item sub-nav-item" data-view="daily-cashflow" data-title="Arus Kas Harian">Arus Kas Harian</button>
           </div>
         </div>
-        <div class="nav-group">
+        <div class="nav-group" data-roles="owner,secretary">
           <button class="nav-item nav-parent" data-view="supplier-dp" data-title="Barang Masuk">Barang Masuk</button>
           <div class="sub-nav">
             <button class="nav-item sub-nav-item" data-view="supplier-dp" data-title="DP Order">DP Order</button>
             <button class="nav-item sub-nav-item" data-view="purchases" data-title="Pembelian Supplier">Pembelian Supplier</button>
           </div>
         </div>
-        <button class="nav-item" data-view="weekly-expenses">Beban Mingguan</button>
-        <button class="nav-item" data-view="saturday-payments">Bayaran Sabtu</button>
-        <button class="nav-item" data-view="suppliers">Data Supplier</button>
-        <button class="nav-item" data-view="reports">Laporan Siklus</button>
+        <button class="nav-item" data-view="weekly-expenses" data-roles="owner,secretary">Beban Mingguan</button>
+        <button class="nav-item" data-view="saturday-payments" data-roles="owner,secretary">Bayaran Sabtu</button>
+        <button class="nav-item" data-view="suppliers" data-roles="owner,secretary">Data Supplier</button>
+        <button class="nav-item" data-view="reports" data-roles="owner,secretary">Laporan Siklus</button>
+        <div class="nav-group" data-roles="owner,sales">
+          <button class="nav-item nav-parent" data-view="sales-dashboard" data-title="Dashboard Sales">Sales</button>
+          <div class="sub-nav">
+            <button class="nav-item sub-nav-item" data-view="sales-dashboard" data-title="Dashboard Sales">Dashboard Sales</button>
+            <button class="nav-item sub-nav-item" data-view="sales-channels" data-title="Sektor Penjualan">Sektor Penjualan</button>
+            <button class="nav-item sub-nav-item" data-view="sales-income" data-title="Uang Masuk Penjualan">Uang Masuk Penjualan</button>
+            <button class="nav-item sub-nav-item" data-view="sales-report" data-title="Laporan Penjualan">Laporan Penjualan</button>
+          </div>
+        </div>
       </nav>
       <div class="sidebar-footer">
         <small>Data tersimpan online di Supabase.</small>
@@ -77,7 +86,7 @@
 
       <section id="alertArea"></section>
 
-      <section id="dashboard" class="view active">
+      <section id="dashboard" data-roles="owner,secretary" class="view active">
         <div class="metric-grid" id="dashboardMetrics"></div>
         <div class="grid two-col">
           <article class="card">
@@ -95,7 +104,7 @@
         </article>
       </section>
 
-      <section id="daily-income" class="view">
+      <section id="daily-income" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header"><h2>Uang Masuk dari Owner</h2></div>
           <form id="ownerCashForm" class="form-grid">
@@ -114,7 +123,7 @@
       </section>
 
 
-      <section id="daily-cashflow" class="view">
+      <section id="daily-cashflow" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header report-actions">
             <div>
@@ -131,7 +140,7 @@
         </article>
       </section>
 
-      <section id="daily-expense" class="view">
+      <section id="daily-expense" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header"><h2>Pengeluaran Harian</h2></div>
           <form id="dailyExpenseForm" class="form-grid">
@@ -156,7 +165,7 @@
         </article>
       </section>
 
-      <section id="daily-closing" class="view">
+      <section id="daily-closing" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header"><h2>Penutupan Kas Harian</h2></div>
           <form id="dailyClosingForm" class="form-grid closing-grid">
@@ -174,7 +183,7 @@
         </article>
       </section>
 
-      <section id="suppliers" class="view">
+      <section id="suppliers" data-roles="owner,secretary" class="view">
         <div class="grid two-col">
           <article class="card">
             <div class="card-header"><h2>Tambah Supplier</h2></div>
@@ -199,7 +208,7 @@
         </div>
       </section>
 
-      <section id="supplier-dp" class="view">
+      <section id="supplier-dp" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header">
             <div><h2>Input DP Order</h2><p class="muted">DP supplier langsung mengurangi sisa kas pada tanggal DP.</p></div>
@@ -223,7 +232,7 @@
         </article>
       </section>
 
-      <section id="purchases" class="view">
+      <section id="purchases" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header"><h2>Input Pembelian Supplier</h2></div>
           <form id="purchaseForm" class="form-grid three-col-form">
@@ -258,7 +267,7 @@
         </article>
       </section>
 
-      <section id="weekly-expenses" class="view">
+      <section id="weekly-expenses" data-roles="owner,secretary" class="view">
         <div class="grid two-col">
           <article class="card">
             <div class="card-header"><h2>Tambah Pengeluaran Mingguan</h2></div>
@@ -285,7 +294,7 @@
         </div>
       </section>
 
-      <section id="saturday-payments" class="view">
+      <section id="saturday-payments" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header">
             <div><h2>Pembayaran Akhir Minggu</h2><p class="muted">Pilih tagihan tempo atau pengeluaran mingguan yang dibayar.</p></div>
@@ -299,7 +308,7 @@
       </section>
 
 
-      <section id="supplier-report" class="view">
+      <section id="supplier-report" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header report-actions">
             <div>
@@ -318,7 +327,64 @@
         </article>
       </section>
 
-      <section id="reports" class="view">
+
+      <section id="sales-dashboard" data-roles="owner,sales" class="view">
+        <div class="metric-grid" id="salesDashboardMetrics"></div>
+        <article class="card">
+          <div class="card-header"><h2>Rekap Penjualan per Sektor</h2></div>
+          <div id="salesDashboardTable"></div>
+        </article>
+      </section>
+
+      <section id="sales-channels" data-roles="owner,sales" class="view">
+        <div class="grid two-col">
+          <article class="card">
+            <div class="card-header"><h2>Tambah Sektor Penjualan</h2></div>
+            <form id="salesChannelForm" class="form-grid">
+              <label>Nama sektor<input name="name" required placeholder="Contoh: Shopee, TikTok, Lazada" /></label>
+              <label>Status
+                <select name="status"><option>Aktif</option><option>Nonaktif</option></select>
+              </label>
+              <label class="full">Catatan<input name="note" placeholder="Opsional" /></label>
+              <button class="btn btn-primary full" type="submit">Simpan Sektor</button>
+            </form>
+          </article>
+          <article class="card">
+            <div class="card-header"><h2>Database Sektor Penjualan</h2></div>
+            <div id="salesChannelTable"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="sales-income" data-roles="owner,sales" class="view">
+        <article class="card">
+          <div class="card-header"><h2>Input Uang Masuk Penjualan</h2></div>
+          <form id="salesIncomeForm" class="form-grid three-col-form">
+            <label>Tanggal<input name="date" type="date" required /></label>
+            <label>Sektor Penjualan
+              <select name="channelId" id="salesIncomeChannelSelect" required>
+                <option value="">Pilih sektor penjualan</option>
+              </select>
+            </label>
+            <label>Nominal<input name="amount" type="number" min="0" step="any" inputmode="numeric" required /></label>
+            <label class="full">Keterangan<input name="note" placeholder="Opsional" /></label>
+            <button class="btn btn-primary full" type="submit">Simpan Uang Masuk</button>
+          </form>
+        </article>
+        <article class="card">
+          <div class="card-header"><h2>Riwayat Uang Masuk Penjualan Siklus</h2></div>
+          <div id="salesIncomeTable"></div>
+        </article>
+      </section>
+
+      <section id="sales-report" data-roles="owner,sales" class="view">
+        <article class="card">
+          <div class="card-header"><h2>Laporan Penjualan Siklus</h2></div>
+          <div id="salesReportContent"></div>
+        </article>
+      </section>
+
+      <section id="reports" data-roles="owner,secretary" class="view">
         <article class="card">
           <div class="card-header report-actions">
             <div><h2>Laporan Siklus Mingguan</h2><p class="muted">Periode Senin sampai Sabtu.</p></div>
