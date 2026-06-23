@@ -39,7 +39,9 @@ function cashPaymentsOnDate(date,excludePaymentId=null){return sum(db.payments.f
 function cashPurchaseOutOnDate(date){return sum(db.purchases.filter(p=>p.date===date&&p.paymentType==='cash').map(p=>({amount:Math.max(0,purchaseTotal(p)-dpAppliedForPurchase(p.id))})))}
 function dailyCashBase(date){return sum(db.ownerCash.filter(x=>x.date===date))-sum(db.dailyExpenses.filter(x=>x.date===date))-cashPurchaseOutOnDate(date)-downPaymentOutOnDate(date)}
 function dailyCashBalance(date,excludePaymentId=null){return dailyCashBase(date)-cashPaymentsOnDate(date,excludePaymentId)}
-function validateCashPayment(date,amount,excludePaymentId=null){const available=dailyCashBalance(date,excludePaymentId);if(amount>available){showAlert(`Saldo kas tanggal ${formatDate(date)} tidak cukup. Sisa kas tersedia ${fmt(available)}.`, 'error');return false;}return true;}
+function isDailyClosed(date){return db.dailyClosings.some(x=>x.date===date)}
+function availableDailyCash(date,excludePaymentId=null){return isDailyClosed(date)?0:dailyCashBalance(date,excludePaymentId)}
+function validateCashPayment(date,amount,excludePaymentId=null){const available=availableDailyCash(date,excludePaymentId);if(amount>available){showAlert(`Saldo kas tanggal ${formatDate(date)} tidak cukup. Sisa kas tersedia ${fmt(available)}.`, 'error');return false;}return true;}
 function purchaseTotal(p){return Number(p.amount ?? (Number(p.qty||0)*Number(p.unitPrice||0)))}
 function statusFor(total,paid){if(paid<=0)return 'unpaid';if(paid<total)return 'partial';return 'paid'}
 function badge(status){const map={paid:['Lunas','badge-paid'],unpaid:['Belum Dibayar','badge-unpaid'],partial:['Dibayar Sebagian','badge-partial']};const [t,c]=map[status]||[status,''];return `<span class="badge ${c}">${t}</span>`}
@@ -90,7 +92,7 @@ async function handle(action){try{await action()}catch(err){console.error(err);s
 
 function renderAll(){renderCycleLabel();renderCashBalanceHeader();renderDashboard();renderOwnerProfit();renderDailyCash();renderDailyCashFlow();renderDailyTransactionTables();renderSuppliers();renderPurchaseOptions();renderPurchaseDpOptions();renderSupplierDownPayments();renderPurchases();renderWeeklyExpenses();renderSaturdayPayments();renderPaymentHistory();renderSupplierReport();renderSalesDashboard();renderSalesChannels();renderSalesIncomes();renderSalesReport();renderReport();applyRoleUi();setDefaultDates()}
 function renderCycleLabel(){const c=getCycle(selectedDate);document.getElementById('cycleLabel').textContent=`Siklus ${formatDate(c.start)} - ${formatDate(c.end)}`}
-function renderCashBalanceHeader(){const box=document.getElementById('cashBalanceHeader');if(!box)return;const d=selectedDate||getTodayLocal();const balance=dailyCashBalance(d);const label=d===getTodayLocal()?'Sisa Kas Hari Ini':'Sisa Kas Tanggal Dipilih';box.innerHTML=`<span>${label}</span><strong class="${balance<0?'negative':''}">${fmt(balance)}</strong><small>${formatDate(d)}</small>`}
+function renderCashBalanceHeader(){const box=document.getElementById('cashBalanceHeader');if(!box)return;const d=selectedDate||getTodayLocal();const closed=isDailyClosed(d);const balance=availableDailyCash(d);const label=d===getTodayLocal()?'Sisa Kas Hari Ini':'Sisa Kas Tanggal Dipilih';box.innerHTML=`<span>${label}${closed?' <em>(sudah ditutup)</em>':''}</span><strong class="${balance<0?'negative':''}">${fmt(balance)}</strong><small>${formatDate(d)}</small>`}
 
 function cycleName(c){
   const months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
@@ -145,6 +147,8 @@ function renderDailyCashFlow(){
   db.supplierDownPayments.filter(x=>x.date===date).forEach(x=>rows.push({createdAt:x.createdAt,type:'credit',desc:`DP Supplier - ${supplierName(x.supplierId)}`,note:x.note||'-',debit:0,credit:Number(x.amount)}));
   db.purchases.filter(p=>p.date===date&&p.paymentType==='cash').forEach(p=>rows.push({createdAt:p.createdAt,type:'credit',desc:`Barang Masuk Cash - ${supplierName(p.supplierId)}`,note:p.note||'-',debit:0,credit:Math.max(0,purchaseTotal(p)-dpAppliedForPurchase(p.id))}));
   db.payments.filter(p=>p.date===date&&p.method==='cash').forEach(p=>rows.push({createdAt:p.createdAt,type:'credit',desc:`Bayaran Sabtu - ${paymentTitle(p)}`,note:'Pembayaran cash',debit:0,credit:Number(p.amount)}));
+  const closing=db.dailyClosings.find(x=>x.date===date);
+  if(closing)rows.push({createdAt:closing.createdAt||`${date}T23:59:59`,type:'credit',desc:'Pengembalian sisa kas ke owner',note:closing.returnedTo?`Dikembalikan kepada ${closing.returnedTo}`:'Penutupan kas',debit:0,credit:Number(closing.physicalCash||0)});
   const sorted=rows.sort((a,b)=>String(a.createdAt||'').localeCompare(String(b.createdAt||'')));
   let saldo=0;
   const rowHtml=sorted.map(r=>{saldo+=r.debit-r.credit;return `<tr><td>${formatDate(date)}</td><td>${r.desc}</td><td>${r.note}</td><td class="amount positive">${r.debit?fmt(r.debit):'-'}</td><td class="amount negative">${r.credit?fmt(r.credit):'-'}</td><td class="amount ${saldo<0?'negative':''}">${fmt(saldo)}</td></tr>`});
