@@ -13,3 +13,9 @@ Jika halaman Sales belum muncul, pastikan `migration-v22-sales-user.sql` dan `se
 - Tabel menampilkan Nama Siklus, Uang Keluar Total, Uang Masuk Sales, dan Profit.
 - Profit dihitung dari Uang Masuk Sales dikurangi Uang Keluar Total.
 - Tidak membutuhkan SQL tambahan.
+
+
+## Versi v27
+- Khusus Bayaran Sabtu: tanggal pembayaran boleh berbeda dari siklus tagihan yang sedang dipilih.
+- Validasi siklus tetap berlaku untuk input transaksi lain.
+- Pembayaran cash tetap memeriksa sisa kas pada tanggal pembayaran dan ditolak jika tanggal tersebut sudah ditutup atau saldo tidak cukup.
