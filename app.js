@@ -77,12 +77,24 @@ function normalizeData(data){
   db.salesChannels=mapRows(data.sales_channels,r=>({id:r.id,createdAt:r.created_at,name:r.name,note:r.note,status:r.status}));
   db.salesIncomes=mapRows(data.sales_incomes,r=>({id:r.id,createdAt:r.created_at,date:r.transaction_date,channelId:r.channel_id,amount:Number(r.amount),note:r.note}));
 }
+async function fetchAllRows(tableName){
+  const pageSize=1000;
+  let from=0;
+  let rows=[];
+  while(true){
+    const {data,error}=await sb.from(tableName).select('*').order('created_at',{ascending:true}).range(from,from+pageSize-1);
+    if(error)throw error;
+    rows=rows.concat(data||[]);
+    if(!data||data.length<pageSize)break;
+    from+=pageSize;
+  }
+  return rows;
+}
 async function loadAll(){
   if(!sb)return;
   const names=['suppliers','owner_cash','daily_expenses','daily_closings','purchases','weekly_expenses','payments','supplier_down_payments','sales_channels','sales_incomes'];
-  const results=await Promise.all(names.map(name=>sb.from(name).select('*').order('created_at',{ascending:true})));
-  const failed=results.find(r=>r.error); if(failed) throw failed.error;
-  const data={}; names.forEach((n,i)=>data[n]=results[i].data);
+  const results=await Promise.all(names.map(name=>fetchAllRows(name)));
+  const data={}; names.forEach((n,i)=>data[n]=results[i]);
   normalizeData(data); renderAll();
 }
 async function insertRow(tableName,payload,msg){const {error}=await sb.from(tableName).insert(payload);if(error)throw error;await loadAll();showAlert(msg)}

@@ -21,3 +21,8 @@ Jika halaman Sales belum muncul, pastikan `migration-v22-sales-user.sql` dan `se
 - Khusus Bayaran Sabtu: tanggal pembayaran boleh berbeda dari siklus tagihan yang sedang dipilih.
 - Validasi siklus tetap berlaku untuk input transaksi lain.
 - Pembayaran cash tetap memeriksa sisa kas pada tanggal pembayaran dan ditolak jika tanggal tersebut sudah ditutup atau saldo tidak cukup.
+
+
+## v31
+- Memperbaiki data transaksi terbaru yang sudah masuk database tetapi tidak tampil di aplikasi ketika jumlah data sudah banyak.
+- Aplikasi sekarang mengambil data secara bertahap/pagination dari Supabase, tidak hanya 1000 baris pertama.
